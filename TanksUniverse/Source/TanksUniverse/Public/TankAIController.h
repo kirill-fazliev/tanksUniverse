@@ -19,6 +19,4 @@ class TANKSUNIVERSE_API ATankAIController : public AAIController
 
 
 private :
-	ATank* GetControlledTank() const;
-	ATank* GetPlayerTank() const;
 };

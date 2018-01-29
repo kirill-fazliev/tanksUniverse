@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), hidecategories=("Collision"))
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class TANKSUNIVERSE_API UTankBarrel : public UStaticMeshComponent
 {
 	GENERATED_BODY()
@@ -17,13 +17,13 @@ class TANKSUNIVERSE_API UTankBarrel : public UStaticMeshComponent
 public:
 	void Elevate(float RelativeSpeed);
 private:
-	UPROPERTY(EditAnywhere, Category="Setup")
+	UPROPERTY(EditDefaultsOnly, Category="Setup")
 	float MaxDegreesPerSecond = 20;
 
-	UPROPERTY(EditAnywhere, Category = "Setup")
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	float MaxElevationDegrees = 40;
 
-	UPROPERTY(EditAnywhere, Category = "Setup")
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	float MinElevationDegrees = 0;
 
 };
