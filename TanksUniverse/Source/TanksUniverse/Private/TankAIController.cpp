@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "TankAIController.h"
+#include "Tank.h"
 
 void ATankAIController::BeginPlay()
 {
@@ -20,7 +21,10 @@ void ATankAIController::BeginPlay()
 void ATankAIController::Tick(float deltaTime)
 {
 	Super::Tick(deltaTime);
-
+	if (GetPlayerTank())
+	{
+		GetControlledTank()->AimAt(GetPlayerTank()->GetActorLocation());
+	}
 }
 
 
