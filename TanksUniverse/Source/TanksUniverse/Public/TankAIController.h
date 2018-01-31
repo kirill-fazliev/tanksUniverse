@@ -5,18 +5,19 @@
 #include "CoreMinimal.h"
 #include "AIController.h"
 #include "TankAIController.generated.h"
-class ATank;
-/**
- * 
- */
 UCLASS()
 class TANKSUNIVERSE_API ATankAIController : public AAIController
 {
 	GENERATED_BODY()
 
 	void BeginPlay() override;
+	void SetPawn(APawn* InPawn) override;
 	void Tick(float) override;
-
+	UFUNCTION()
+	void OnPossedTankDeath();
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	float AcceptanceRadius = 80000.0;
 
 private :
 };

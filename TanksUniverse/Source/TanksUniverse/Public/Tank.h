@@ -4,53 +4,32 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "TankAimingComponent.h"
+
 #include "Tank.generated.h"
 
-class UTankBarrel;
-class UTankTurret;
-class AProjectile;
-class UTankAimingComponent;
-class UTankMovementComponent;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTankDelegate);
+
 UCLASS()
 class TANKSUNIVERSE_API ATank : public APawn
 {
 	GENERATED_BODY()
 
 public:
+	virtual float TakeDamage(float Damage,
+		struct FDamageEvent const& DamageEvent,
+		AController* EventInstigator,
+		AActor* DamageCauser) override;
 	// Sets default values for this pawn's properties
-	ATank();
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	UFUNCTION(BlueprintCallable, Category="Setup")
-	void SetBarrelReference(UTankBarrel*  BarrelToSet);
+	UFUNCTION(BlueprintPure, Category = "Health")
+	float GetHealthPercent() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Setup")
-	void SetTurretReference(UTankTurret* TurretToSet);
+	void BeginPlay() override;
 
-	UFUNCTION(BlueprintCallable, Category = "Firing")
-	void Fire();
-
-
-	UPROPERTY(EditAnywhere, Category = "Firing")
-	float LaunchSpeed = 100000;
-
+	FTankDelegate OnDeath;
+private:
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
-	TSubclassOf<AProjectile> ProjectileBluepint;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Setup")
-	float ReloadTimeInSeconds = 3.0f;
-
-	UTankBarrel* Barrel = nullptr;
-protected:
-	UTankAimingComponent* TankAimingComponent = nullptr;
-	UPROPERTY(BlueprintReadOnly)
-	UTankMovementComponent* TankMovementComponent = nullptr;
-
-public:	
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	void AimAt(FVector HitLocation);
-
-	double LastFireTime = 0.0;
-
+	int32 StartingHealth = 100;
+	UPROPERTY(VisibleAnywhere, Category = "Health")
+	int32 CurrentHealth;
 };

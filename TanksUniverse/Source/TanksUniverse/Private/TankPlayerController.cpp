@@ -2,11 +2,39 @@
 
 
 #include "TankPlayerController.h"
+#include "Engine/World.h"
 #include "Tank.h"
+
+
+void ATankPlayerController::SetPawn(APawn* InPawn)
+{
+	Super::SetPawn(InPawn);
+	if (InPawn)
+	{
+		auto PossesedTank = Cast<ATank>(InPawn);
+		if (!ensure(PossesedTank))
+		{
+			return;
+		}
+		PossesedTank->OnDeath.AddDynamic(this, &ATankPlayerController::OnPossedTankDeath);
+	}
+}
+
+void ATankPlayerController::OnPossedTankDeath()
+{
+	StartSpectatingOnly();
+}
 
 void ATankPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+	auto AutoComponent = GetPawn()->FindComponentByClass<UTankAimingComponent>();
+	if (!ensure(AutoComponent))
+	{
+		return;
+	}
+	FoundAimingComponent(AutoComponent);
+
 }
 
 void ATankPlayerController::Tick(float deltaTime)
@@ -15,23 +43,23 @@ void ATankPlayerController::Tick(float deltaTime)
 	AimTowardsCrosshair();
 }
 
-
-ATank * ATankPlayerController::GetControlledTank() const
-{
-	return Cast<ATank>(GetPawn());
-}
-
 void ATankPlayerController::AimTowardsCrosshair()
 {
-	if (!GetControlledTank())
+	if (!GetPawn())
+	{
+		return;
+	}
+	auto AutoComponent = GetPawn()->FindComponentByClass<UTankAimingComponent>();
+	if (!ensure(AutoComponent))
 	{
 		return;
 	}
 	auto Time = GetWorld()->GetTimeSeconds();
 	FVector HitLocation;
-	if (GetSightRayHitLocation(HitLocation))
+	bool bGotHitLocation = GetSightRayHitLocation(HitLocation);
+	if (bGotHitLocation)
 	{
-		GetControlledTank()->AimAt(HitLocation);
+		AutoComponent->AimAt(HitLocation);
 	}
 }
 
@@ -45,10 +73,10 @@ bool ATankPlayerController::GetSightRayHitLocation(FVector & HitLocation) const
 
 	if (GetLookDirection(ScreenLocation, LookDirection))
 	{
-		GetLookVectorHitLocation(LookDirection, HitLocation);
+		return GetLookVectorHitLocation(LookDirection, HitLocation);
 	}
 
-	return true;
+	return false;
 }
 
 bool ATankPlayerController::GetLookVectorHitLocation(FVector LookDirection, FVector& HitLocation) const
@@ -56,7 +84,7 @@ bool ATankPlayerController::GetLookVectorHitLocation(FVector LookDirection, FVec
 	FHitResult HtResult;
 	auto StartLocation = PlayerCameraManager->GetCameraLocation();
 	auto EndLocation = StartLocation + (LookDirection * LineTraceRange);
-	if (GetWorld()->LineTraceSingleByChannel(HtResult, StartLocation, EndLocation, ECollisionChannel::ECC_Visibility)
+	if (GetWorld()->LineTraceSingleByChannel(HtResult, StartLocation, EndLocation, ECollisionChannel::ECC_Camera)
 		)
 	{
 		HitLocation = HtResult.Location;

@@ -4,23 +4,29 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "TankAimingComponent.h"
 #include "TankPlayerController.generated.h"
 /**
  * 
  */
 
-class ATank;
 UCLASS()
 class TANKSUNIVERSE_API ATankPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
-public:
+protected:
+	UFUNCTION(BlueprintImplementableEvent, Category = "Setup")
+	void FoundAimingComponent(UTankAimingComponent* AimCompRef);
 
-	ATank * GetControlledTank() const;
+public:
+	void SetPawn(APawn * InPawn) override;
+	void OnPossedTankDeath();
 	void BeginPlay() override;
 	void Tick(float) override;
 private:
+
+
 	void AimTowardsCrosshair();
 	bool GetSightRayHitLocation(FVector& HitLocation) const;
 
